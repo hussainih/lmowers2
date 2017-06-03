@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Employer Work</title>
+
+    <!-- Bootstrap -->
+    <!--<link href="/stylesheets/bootstrap.min.css" rel="stylesheet">-->
+    <link href="/stylesheets/style.css" rel="stylesheet">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+    <![endif]-->
+</head>
+<style type="text/css">
+    *{
+        font-family: "Segoe UI";
+    }
+</style>
+<body>
+
+
+<div id="jsGrid_users"></div>
+
+<script>
+    $("#jsGrid_users").jsGrid({
+        height: "500px",
+        width: "100%",
+        filtering: true,
+        editing: true,
+        inserting: true,
+        sorting: true,
+        paging: true,
+        autoload: true,
+        pageSize: 10,
+        pageButtonCount: 5,
+        controller: {
+            loadData: function (filter) {
+                var data = $.Deferred();
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "/readAds",
+                    dataType: "json"
+                }).done(function (response) {
+                    response = $.grep(response, function (item) {
+                        return (!filter.firstName || item.firstName.indexOf(filter.firstName) > -1)
+                                && (!filter.lastName || item.lastName.indexOf(filter.lastName) > -1)
+                                && (!filter.username || item.username.indexOf(filter.username) > -1)
+                                && (!filter.email || item.email.indexOf(filter.email) > -1)
+                                && (!filter.userType || item.userType.indexOf(filter.userType) > -1);
+                    });
+                    response.push({"token" : "\"" + localStorage.getItem("token") + "\"" });
+                    data.resolve(response);
+                    console.log(response);
+                });
+                return data.promise();
+            },
+
+            insertItem: function (item) {
+                item.token= localStorage.getItem("token");
+                return $.ajax({
+                    type: "POST",
+                    url: "/secure/createAds",
+                    data: item,
+
+                }).done(function () {
+                    $("#jsGrid_users").jsGrid("loadData");
+                });
+            },
+
+            updateItem: function (item) {
+                item.token= localStorage.getItem("token");
+                return $.ajax({
+                    type: "POST",
+                    url: "/secure/updateAds",
+                    data: item
+                }).done(function () {
+                    $("#jsGrid_users").jsGrid("loadData");
+                });
+            },
+
+            deleteItem: function (item) {
+                item.token= localStorage.getItem("token");
+                return $.ajax({
+                    type: "DELETE",
+                    url: "/secure/deleteAds",
+                    data: item
+                }).done(function () {
+                    $("#jsGrid_users").jsGrid("loadData");
+                });
+            },
+        },
+
+
+        fields: [
+            {name: "id", type: "text", width: 150, editing: false},
+            {name: "employeerId", type: "text", width: 150, editing: false, validate: "required"},
+            {name: "Area", type: "text", width: 150, editing: true, validate: "required"},
+            {name: "grassHeight", type: "text", width: 150, editing: false, validate: "required"},
+            {name: "payAmount", type: "text", width: 150, editing: false, validate: "required"},
+            {name: "availableFrom", type: "text", width: 150, editing: false, validate: "required"},
+            {name: "availableTo", type: "text", width: 150, editing: false, validate: "required"},
+
+            {type: "control"}
+        ]
+    });
+</script>
+<script>
+
+    function postJob()
+    {
+
+        $.ajax
+        ({
+
+            type: "POST",
+            url: "/checkToken",
+            dataType: 'json',
+            async: false,
+            data: {
+
+                "token": localStorage.getItem("token")
+            },
+            success: function (data , status) {
+                if(data.validated == "no"){
+                    alert("Authentication failed, please login");
+                }
+                if(data.validated == "yes"){
+                    window.location = "/employerworkdetails";
+                }
+
+
+            }
+        });
+    }
+
+
+    function updateAds(id)
+    {
+
+        $.ajax
+        ({
+
+            type: "POST",
+            url: "/secure/updateAds",
+            dataType: 'json',
+            async: false,
+            data: {
+
+                "token": localStorage.getItem("token"),
+                "adId": id
+            },
+            success: function (data , status) {
+                if(data.validated == "no"){
+                    alert("Authentication failed, please login");
+                }
+                if(data.validated == "yes"){
+                    window.location = "/employerworkdetails";
+                }
+
+
+            }
+        });
+    }
+</script>
+</body>
+</html>
