@@ -86,7 +86,7 @@
         </table>
       </div>
       <button type="button" onclick="postJobAuth()" class="btn btn-primary post-jobs">Post Jobs</button>
-      <button type="button" onclick="postJobAuth()" class="btn btn-primary rest-jobs">Consume Rest on Server 2</button>
+      <button type="button" onclick="consume()" class="btn btn-primary rest-jobs">Consume Rest on Server 2</button>
     </section>
     <section class="emp-view map-view col-lg-offset-1 col-lg-5">
       <div id="map"></div>
@@ -244,6 +244,34 @@
       });
     }
 
+    function consume()
+    {
+
+      $.ajax
+      ({
+
+        type: "POST",
+        url: "/checkToken",
+        dataType: 'json',
+        async: false,
+        data: {
+
+          "token": localStorage.getItem("token")
+        },
+        success: function (data , status) {
+
+
+
+          if(data.validated == "yes") {
+            window.location = "/readlmower1";
+          } else{
+            alert("please login first");
+          }
+
+        }
+
+      });
+    }
 
 </script>
 
