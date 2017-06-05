@@ -19,7 +19,12 @@ var secureRoutes = express.Router();
 var checkToken = require('./routes/checkToken');
 var ads = require('./routes/ads');
 var readAds = require('./routes/readAds');
+var readLmower1 = require('./routes/readLmower1');
 
+var cors = require('cors')
+
+var app = express()
+app.use(cors())
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -41,12 +46,14 @@ app.use('/register', register );
 app.use('/employerworkdetails', employerworkdetails);
 app.use('/sample', sample);
 app.use('/checkToken', checkToken);
+app.use('/readlmower1', readLmower1);
 secureRoutes.use(function(req, res, next){
   var token = req.body.token || req.headers['token'];
   if(token){
     console.log("the TOken is" +token);
     jwt.verify(token,process.env.SECRET_KEY, function(err, decode){
       if(err){
+
         res.status(500).send("Invalid Token");
       } else{
         next();
@@ -61,7 +68,8 @@ secureRoutes.use(function(req, res, next){
 });
 
 secureRoutes.post('/createAds', ads.createAds)
-app.use('/readAds', readAds);
+secureRoutes.post('/readAds', ads.readAds);
+
 secureRoutes.delete('/deleteAds', ads.deleteAds);
 secureRoutes.post('/updateAds',ads.updateAds);
 
@@ -73,6 +81,11 @@ app.use(function(req, res, next) {
   next(err);
 });
 
+app.all('/*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development

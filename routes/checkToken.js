@@ -10,8 +10,9 @@ var jwt = require('jsonwebtoken');
 
 /* GET home page. */
 router.post('/', function(req, res, next) {
-    var token = req.body.token || req.headers['token'];
 
+     token = req.body.token || req.headers['token'];
+    console.log("The token is ", token);
     if(token){
         jwt.verify(token, process.env.SECRET_KEY, function(err, decode){
             if(err){
@@ -28,7 +29,9 @@ router.post('/', function(req, res, next) {
         });
 
     } else {
-        res.send("please send a token");
+        res.json({
+            success:"please send a token"
+        });
     }
 
 });

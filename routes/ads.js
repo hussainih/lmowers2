@@ -84,5 +84,26 @@ module.exports.updateAds = function(req, res, next){
 
 }
 
+module.exports.readAds = function(req, res, next){
+    var sql = "select * from lmower.ads";
+
+    var con = mysql.createConnection({
+        host: "35.189.237.219",
+        user: "root",
+        password: "lmowerpassword"
+    });
+
+
+
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log("connected");
+        con.query(sql, function (err, result) {
+            if(err) throw err;
+            res.json(result);
+        });
+    });
+
+}
 
 
