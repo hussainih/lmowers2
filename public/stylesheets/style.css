@@ -134,7 +134,13 @@ body {
 .mower-img img{
   width: 60%;
 }
-.post-jobs{
+.post-jobs, .post-jobs:hover, .post-jobs:focus{
   background-color: #000000;
   width: 25%;
+  border: 0;
+}
+.rest-jobs, .rest-jobs:hover, .rest-jobs:focus{
+  width:auto;
+  background: brown;
+  border: 0;
 }
